@@ -1,9 +1,9 @@
 # ProyectoUno Fotografia Computacional
 
 By:
-Alejandro Endo
-Luan D. Erazo
-Sergio Cardona
+Alejandro Endo,
+Luan D. Erazo,
+Sergio Cardona.
 
 Formato de la entrega (Introducción, desarrollo, análisis y conclusiones)...............................................15%
 
