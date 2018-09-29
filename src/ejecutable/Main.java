@@ -10,7 +10,7 @@ public class Main extends PApplet {
 	/**
 	 * El objetivo es que para cada uno de los requerimientos del proyecto se deje
 	 * un tamaño especifico para el canvas, para eso usar el metodo
-	 * surface.setSize(w,h); en el constructor de la clase.
+	 * app.getSurface().setSize(w,h); en el constructor de la clase.
 	 * 
 	 * Para cada uno de los requerimientos se está usando una clase.
 	 * 
@@ -45,6 +45,7 @@ public class Main extends PApplet {
 
 	@Override
 	public void setup() {
+		surface.setResizable(true);
 		img = loadImage("../data/mini.jpg"); // Imagen inicial
 
 		canales = new PImage[3]; // Arreglo de canales 2:Red - 1:Green - 0:Blue
