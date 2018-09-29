@@ -16,7 +16,7 @@ public class CanalHistograma {
 	private int w;
 	private int h;
 	private int offset;
-
+	
 	private int maxValue;
 
 	public CanalHistograma(PApplet app, PImage[] canales) {
@@ -24,7 +24,6 @@ public class CanalHistograma {
 		this.canales = canales;
 
 		// 247 * 640
-		app.getSurface().setSize(750, 660);
 
 		w = canales[0].width;
 		h = canales[0].height;
@@ -43,8 +42,10 @@ public class CanalHistograma {
 		int maxB = PApplet.max(blue);
 
 		maxValue = PApplet.max(maxR, maxG, maxB);
-
-		app.background(0);
+	}
+	
+	public void reSize() {
+		app.getSurface().setSize(w * 3, h * 3 + offset * 2);
 	}
 
 	public void display() {

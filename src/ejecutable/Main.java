@@ -32,6 +32,8 @@ public class Main extends PApplet {
 
 	// Manager de cada uno de los puntos a cumplir.
 	private int caso;
+	
+	private boolean reSize;
 
 	public static void main(String[] args) {
 		PApplet.main("ejecutable.Main");
@@ -39,7 +41,7 @@ public class Main extends PApplet {
 
 	@Override
 	public void settings() {
-		size(20, 20); // El tamaño en este caso no importa pues en cada caso se va a cambiar el tamaño
+		size(750, 660); // El tamaño en este caso no importa pues en cada caso se va a cambiar el tamaño
 						// de la ventana segun se requiera
 	}
 
@@ -60,66 +62,71 @@ public class Main extends PApplet {
 		contraste = new Contraste(this, canales);
 		tiffBonus = new TIFF(this, canales);
 		bordesBonus = new RecortarBordes(this, canales);
-
 	}
 
 	@Override
 	public void draw() {
-
+		background(0);
 		switch (caso) {
 		case 0: // Separacion correcta canales de color imagen con sus respectivos
 				// historgramas.
 			histograma.display();
+			
+			if(reSize) {
+				reSize = false;
+				histograma.reSize();
+			}
 			break;
 
 		case 1: // TODO Alineacion de los 3 canales de color de la imagen.
 			alineacion.display();
+			
+			if(reSize) {
+				reSize = false;
+				alineacion.reSize();
+			}
 			break;
 
 		case 2: // TODO Mejorar contraste de la imagen - Histogram equialization u otra tecnica.
 			contraste.display();
+			
+			if(reSize) {
+				reSize = false;
+				contraste.reSize();
+			}
 			break;
 
 		// BONUS
 
 		case 3: // TODO usar imagenes TIFf de alta resolucion.
 			tiffBonus.display();
+			
+			if(reSize) {
+				reSize = false;
+				tiffBonus.reSize();
+			}
 			break;
 
 		case 4: // TODO Recortar bordes de la imagen.
 			bordesBonus.display();
+			
+			if(reSize) {
+				reSize = false;
+				bordesBonus.reSize();
+			}
 			break;
 		}
 	}
 
 	@Override
 	public void keyPressed() {
-		switch (keyCode) {
-		case 96:
-			caso = 0;
-			System.out.println("[SEPEARACION CORRECTA DE CANALES DE COLOR]");
-			break;
-		case 97:
-			caso = 1;
-			System.out.println("[ALINEACION DE LOS 3 CANALES DE COLOR]");
-			break;
-
-		case 98:
-			caso = 2;
-			System.out.println("[MEJORAR CONTRASTE DE LA IMAGEN]");
-			break;
-
-		case 99:
-			caso = 3;
-			System.out.println("[BONUS] uso de imagen de alta resolución");
-			break;
-
-		case 100:
-			caso = 4;
-			System.out.println("[BONUS] Recorte de bordes");
-			break;
+		if (keyCode == RIGHT && caso < 4) {
+			caso++;
+			reSize = true;
+		} else if (keyCode == LEFT && caso > 0) {
+			caso--;
+			reSize = true;
 		}
 	}
 
-	
 }

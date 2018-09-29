@@ -17,4 +17,8 @@ public class TIFF {
 	public void display() {
 
 	}
+	
+	public void reSize() {
+		app.getSurface().setSize(750, 660);
+	}
 }
