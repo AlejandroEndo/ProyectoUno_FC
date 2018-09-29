@@ -67,7 +67,7 @@ public class Main extends PApplet {
 	public void draw() {
 
 		switch (caso) {
-		case 0: // TODO Separacion correcta canales de color imagen con sus respectivos
+		case 0: // Separacion correcta canales de color imagen con sus respectivos
 				// historgramas.
 			histograma.display();
 			break;
