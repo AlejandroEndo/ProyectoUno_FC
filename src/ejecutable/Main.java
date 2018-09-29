@@ -1,18 +1,37 @@
 package ejecutable;
 
+import funcionalidad.*;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
 public class Main extends PApplet {
 
-	private PImage img;
-	private PImage newImg;
+	/**
+	 * El objetivo es que para cada uno de los requerimientos del proyecto se deje
+	 * un tamaño especifico para el canvas, para eso usar el metodo
+	 * surface.setSize(w,h); en el constructor de la clase.
+	 * 
+	 * Para cada uno de los requerimientos se está usando una clase.
+	 * 
+	 * Cada una de estas clases debe estar incluida en el paquete "funcionalidad".
+	 */
 
+	// Clases/Requerimientos
+	private Alineacion alineacion;
+	private CanalHistograma histograma;
+	private Contraste contraste;
+	private RecortarBordes bordesBonus;
+	private TIFF tiffBonus;
+
+	// Imagen con la que se trabaja.
+	private PImage img;
+
+	// Recorte inicial de la imagen.
 	private PImage[] canales;
 
-	private int[] red;
-	private int[] blue;
+	// Manager de cada uno de los puntos a cumplir.
+	private int caso;
 
 	public static void main(String[] args) {
 		PApplet.main("ejecutable.Main");
@@ -20,65 +39,86 @@ public class Main extends PApplet {
 
 	@Override
 	public void settings() {
-		size(247, 640);
+		size(20, 20); // El tamaño en este caso no importa pues en cada caso se va a cambiar el tamaño
+						// de la ventana segun se requiera
 	}
 
 	@Override
 	public void setup() {
 		img = loadImage("../data/mini.jpg"); // Imagen inicial
-		newImg = createImage(img.width, img.height / 3, RGB); // Imagen nueva
 
 		canales = new PImage[3]; // Arreglo de canales 2:Red - 1:Green - 0:Blue
 
-		red = new int[30];
-		blue = new int[30];
-
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 3; i++) { // Se recortan cada una de las imagenes
 			canales[i] = img.get(0, i * (img.height / 3), img.width, img.height / 3);
 		}
 
-		int[] rssd = new int[900];
-		int[] bssd = new int[900];
+		// Inicializacion de las clases/requerimientos
+		histograma = new CanalHistograma(this, canales);
+		alineacion = new Alineacion(this, canales);
+		contraste = new Contraste(this, canales);
+		tiffBonus = new TIFF(this, canales);
+		bordesBonus = new RecortarBordes(this, canales);
 
-		int index = 0;
-
-		for (int i = -15; i < 15; i++) {
-			for (int j = -15; j < 15; j++) {
-				PVector values = SSD(canales[1], canales[0], canales[2], i, j);
-
-				rssd[index] = (int) values.x;
-				bssd[index] = (int) values.y;
-				index++;
-			}
-		}
-		
-		System.out.println(index);
-		
-		int minRed = min(rssd);
-		int minBlue = min(bssd);
-
-		System.out.println(minRed);
-
-		image(canales[0], 0, 0);
 	}
 
-	private PVector SSD(PImage img1, PImage img2, PImage img3, int offsetX, int offsetY) {
-		float redSSD = 0;
-		float blueSSD = 0;
+	@Override
+	public void draw() {
 
-		for (int i = 15; i < img1.width - 15; i++) {
-			for (int j = 15; j < img1.height - 15; j++) {
-				// int index = i + (j * img1.width);
+		switch (caso) {
+		case 0: // TODO Separacion correcta canales de color imagen con sus respectivos
+				// historgramas.
+			histograma.display();
+			break;
 
-				float r = red(img2.get(i + offsetX, j + offsetY));
-				float g = green(img1.get(i, j));
-				float b = blue(img3.get(i + offsetX, j + offsetY));
+		case 1: // TODO Alineacion de los 3 canales de color de la imagen.
+			alineacion.display();
+			break;
 
-				redSSD += pow(g - r, 2);
-				blueSSD += pow(g - b, 2);
-			}
+		case 2: // TODO Mejorar contraste de la imagen - Histogram equialization u otra tecnica.
+			contraste.display();
+			break;
+
+		// BONUS
+
+		case 3: // TODO usar imagenes TIFf de alta resolucion.
+			tiffBonus.display();
+			break;
+
+		case 4: // TODO Recortar bordes de la imagen.
+			bordesBonus.display();
+			break;
 		}
-
-		return new PVector(redSSD, blueSSD);
 	}
+
+	@Override
+	public void keyPressed() {
+		switch (keyCode) {
+		case 96:
+			caso = 0;
+			System.out.println("[SEPEARACION CORRECTA DE CANALES DE COLOR]");
+			break;
+		case 97:
+			caso = 1;
+			System.out.println("[ALINEACION DE LOS 3 CANALES DE COLOR]");
+			break;
+
+		case 98:
+			caso = 2;
+			System.out.println("[MEJORAR CONTRASTE DE LA IMAGEN]");
+			break;
+
+		case 99:
+			caso = 3;
+			System.out.println("[BONUS] uso de imagen de alta resolución");
+			break;
+
+		case 100:
+			caso = 4;
+			System.out.println("[BONUS] Recorte de bordes");
+			break;
+		}
+	}
+
+	
 }
