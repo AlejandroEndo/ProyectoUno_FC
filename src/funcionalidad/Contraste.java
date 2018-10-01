@@ -6,11 +6,11 @@ import processing.core.PImage;
 public class Contraste {
 	private PApplet app;
 
-	private PImage[] canales;
+	private PImage img;
 
-	public Contraste(PApplet app, PImage[] canales) {
+	public Contraste(PApplet app, PImage img) {
 		this.app = app;
-		this.canales = canales;
+		this.img = img;
 	}
 
 	public void display() {

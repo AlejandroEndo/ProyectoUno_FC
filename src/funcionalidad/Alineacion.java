@@ -153,4 +153,7 @@ public class Alineacion {
 		System.out.println("[BLUE]: X " + bx + " Y " + by);
 	}
 
+	public PImage getImage() {
+		return image;
+	}
 }

@@ -28,12 +28,13 @@ public class Main extends PApplet {
 
 	// Imagen con la que se trabaja.
 	private PImage img;
+	private PImage alineada;
 
 	// Recorte inicial de la imagen.
 	private PImage[] canales;
 
 	// Manager de cada uno de los puntos a cumplir.
-	private int caso;
+	private int caso = 4;
 
 	private boolean reSize;
 
@@ -61,11 +62,14 @@ public class Main extends PApplet {
 		// Inicializacion de las clases/requerimientos
 		histograma = new CanalHistograma(this, canales);
 		alineacion = new Alineacion(this, canales);
-		contraste = new Contraste(this, canales);
-		tiffBonus = new TIFF(this, canales);
-		bordesBonus = new RecortarBordes(this, canales);
-		whitePatch = new WhitePatch(this, canales);
 		nnc = new AlineacionNNC(this, canales);
+		
+		alineada = alineacion.getImage();
+		
+		whitePatch = new WhitePatch(this, alineada);
+		contraste = new Contraste(this, alineada);
+		tiffBonus = new TIFF(this, canales);
+		bordesBonus = new RecortarBordes(this, alineada);
 	}
 
 	@Override
