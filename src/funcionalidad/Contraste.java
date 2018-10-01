@@ -8,7 +8,7 @@ public class Contraste
 {
 	private PApplet app;
 
-	private PImage[] canales;
+	private PImage canales;
 	private PImage image;
 	
 	private int[] hred;
@@ -24,16 +24,16 @@ public class Contraste
 	private int offset;
 	
 
-	public Contraste(PApplet app, PImage[] canales) 
+	public Contraste(PApplet app, PImage canales) 
 	{
 		this.app = app;
 		this.canales = canales;
 		
-		w = canales[0].width;
-		h = canales[0].height;
+		w = canales.width;
+		h = canales.height;
 		offset = 10;
 		
-		image = app.createImage(canales[0].width, canales[0].height, PConstants.RGB);
+		image = app.createImage(canales.width, canales.height, PConstants.RGB);
 		
 		hred = new int[256];
 		hgreen = new int[256];
@@ -42,10 +42,10 @@ public class Contraste
 		hCred = new int[256];
 		hCgreen = new int[256];
 		hCblue = new int[256];
-
-		hred = hist(canales[2], "r");
-		hgreen = hist(canales[1], "g");
-		hblue = hist(canales[0], "b");
+		
+		hred = hist(canales, "r");
+		hgreen = hist(canales, "g");
+		hblue = hist(canales, "b");
 		
 		hCred = histC(hred, w, h);
 		hCgreen = histC(hgreen, w, h);
@@ -56,11 +56,7 @@ public class Contraste
 	}
 
 	public void display() 
-	{
-		app.image(canales[2], 0, 0);
-		app.image(canales[1], 0, h + offset);
-		app.image(canales[0], 0, (h + offset) * 2);
-		
+	{		
 		app.image(image, w, 2 * (h / 3), w * 2, h * 2);
 	}
 	
@@ -117,15 +113,15 @@ public class Contraste
 	}
 	
 	// Calcular imagen ecualizada
-	private void imagenEq(PImage img, PImage[] canal, int[] histR, int[] histG, int[] histB) {
+	private void imagenEq(PImage img, PImage canal, int[] histR, int[] histG, int[] histB) {
 		img.loadPixels();
 		for (int i = 0; i < img.width; i++) {
 			for (int j = 0; j < img.height; j++) {
 				int index = i + j * img.width;
 
-				int r = histR[(int) app.red(canal[2].get(i,j))];
-				int g = histG[(int) app.green(canal[1].get(i,j))];
-				int b = histB[(int) app.blue(canal[0].get(i,j))];
+				int r = histR[(int) app.red(canal.get(i,j))];
+				int g = histG[(int) app.green(canal.get(i,j))];
+				int b = histB[(int) app.blue(canal.get(i,j))];
 
 				img.pixels[index] = app.color(r, g, b);
 			}
