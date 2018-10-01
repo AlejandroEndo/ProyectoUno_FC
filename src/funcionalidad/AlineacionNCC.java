@@ -5,12 +5,12 @@ import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
 
-public class Alineacion {
-
+public class AlineacionNCC {
 	private PApplet app;
 
 	private PImage[] canales;
-
+	private PImage[] normalized;
+	
 	private PImage image;
 
 	private int src;
@@ -19,50 +19,67 @@ public class Alineacion {
 	private int h;
 	private int offset;
 
+	private int redAvg;
+	private int greenAvg;
+	private int blueAvg;
+	
 	private int ofRedX;
 	private int ofRedY;
 
 	private int ofBlueX;
 	private int ofBlueY;
 
-	public Alineacion(PApplet app, PImage[] canales) {
-		System.out.println("[ALINEANDO FOTOS]");
+	public AlineacionNCC(PApplet app, PImage[] canales) {
 		this.app = app;
 		this.canales = canales;
 
-		image = app.createImage(canales[0].width, canales[0].height, PConstants.RGB);
-
 		w = canales[0].width;
 		h = canales[0].height;
-		
+
 		offset = 10;
 		src = 5;
 
+		normalized = new PImage[3];
+
+		image = app.createImage(canales[0].width, canales[0].height, PConstants.RGB);
+		
+		for (int i = 0; i < canales.length; i++) {
+			normalized[i] = app.createImage(canales[i].width, canales[i].height, PConstants.RGB);
+		}
+
+		redAvg = promedio(canales[2], 'r');
+		greenAvg = promedio(canales[1], 'g');
+		blueAvg = promedio(canales[0], 'b');
+
+		normalized[2] = normalizar(canales[2], normalized[2], redAvg, 'r');
+		normalized[1] = normalizar(canales[1], normalized[1], redAvg, 'g');
+		normalized[0] = normalizar(canales[0], normalized[0], redAvg, 'b');
+		
 		PVector[] redComparator = new PVector[(int) PApplet.pow(src * 2, 2) + 1];
 		PVector[] blueComparator = new PVector[(int) PApplet.pow(src * 2, 2) + 1];
-
+		
 		for (int i = 0; i < 101; i++) {
 			redComparator[i] = new PVector();
 			blueComparator[i] = new PVector();
 		}
-
+		
 		alinear(redComparator, blueComparator);
 
 		asignarPixeles(image, canales, ofRedX, ofRedY, ofBlueX, ofBlueY);
 	}
-	
-	public void reSize() {
-		app.getSurface().setSize(w * 3, h * 3 + offset * 2);
-	}
 
 	public void display() {
-		app.image(canales[2], 0, 0);
-		app.image(canales[1], 0, h + offset);
-		app.image(canales[0], 0, (h + offset) * 2);
-
+		app.image(normalized[2], 0, 0);
+		app.image(normalized[1], 0, h + offset);
+		app.image(normalized[0], 0, (h + offset) * 2);
+		
 		app.image(image, w, 2 * (h / 3), w * 2, h * 2);
 	}
 
+	public void reSize() {
+		app.getSurface().setSize(w * 3, h * 3 + offset * 2);
+	}
+	
 	private void alinear(PVector[] Pred, PVector[] Pblue) {
 		int index = 0;
 
@@ -73,11 +90,11 @@ public class Alineacion {
 			for (int j = -src; j < src; j++) {
 
 				// RED
-				Pred[index] = diferencia(i, j, canales[2], canales[1], 'r');
+				Pred[index] = diferencia(i, j, normalized[2], normalized[1], 'r');
 				redSSD[index] = (int) Pred[index].z;
 
 				// BLUE
-				Pblue[index] = diferencia(i, j, canales[0], canales[1], 'b');
+				Pblue[index] = diferencia(i, j, normalized[0], normalized[1], 'b');
 				blueSSD[index] = (int) Pblue[index].z;
 				index++;
 			}
@@ -141,8 +158,8 @@ public class Alineacion {
 				int index = i + j * img.width;
 
 				int r = (int) app.red(canal[2].get(i + rx, j + ry));
-				int g = (int) app.green(canal[1].get(i, j));
-				int b = (int) app.blue(canal[0].get(i + bx, j + by));
+				int g = (int) app.red(canal[1].get(i, j));
+				int b = (int) app.red(canal[0].get(i + bx, j + by));
 
 				img.pixels[index] = app.color(r, g, b);
 			}
@@ -151,9 +168,59 @@ public class Alineacion {
 		System.out.println("[RED]: X " + rx + " Y " + ry);
 		System.out.println("[BLUE]: X " + bx + " Y " + by);
 	}
+
+	private PImage normalizar(PImage org, PImage img,  int avg, char c) {
+		int nv = 0;
+		img.loadPixels();
+		for (int i = 0; i < org.width; i++) {
+			for (int j = 0; j < org.height; j++) {
+				int index = i + j * org.width;
+				switch (c) {
+				case 'r':
+					float r = app.red(org.get(i, j));
+					nv = (int) ((r - avg) / PApplet.sqrt(PApplet.pow(r - avg, 2)));
+					break;
+
+				case 'g':
+					float g = app.green(org.get(i, j));
+					nv = (int) ((g - avg) / PApplet.sqrt(PApplet.pow(g - avg, 2)));
+					break;
+
+				case 'b':
+					float b = app.blue(org.get(i, j));
+					nv = (int) ((b - avg) / PApplet.sqrt(PApplet.pow(b - avg, 2)));
+					break;
+				}
+				img.pixels[index] = (int) app.color(nv);
+			}
+		}
+		img.updatePixels();
+		return img;
+	}
+
+	private int promedio(PImage img, char c) {
+		float average = 0;
+		for (int i = 0; i < img.width; i++) {
+			for (int j = 0; j < img.height; j++) {
+				switch (c) {
+				case 'r':
+					average += app.red(img.get(i, j));
+					break;
+
+				case 'g':
+					average += app.green(img.get(i, j));
+					break;
+
+				case 'b':
+					average += app.blue(img.get(i, j));
+					break;
+				}
+			}
+		}
+		return (int) average / img.pixels.length;
+	}
 	
 	public PImage getImage() {
 		return image;
 	}
-
 }

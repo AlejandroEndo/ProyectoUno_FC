@@ -21,19 +21,20 @@ public class Main extends PApplet {
 	private Alineacion alineacion;
 	private CanalHistograma histograma;
 	private Contraste contraste;
-	private AlineacionNNC nnc;
+	private AlineacionNCC ncc;
 	private WhitePatch whitePatch;
 	private RecortarBordes bordesBonus;
 	private TIFF tiffBonus;
 
 	// Imagen con la que se trabaja.
 	private PImage img;
+	private PImage alineada;
 
 	// Recorte inicial de la imagen.
 	private PImage[] canales;
 
 	// Manager de cada uno de los puntos a cumplir.
-	private int caso;
+	private int caso = 2;
 
 	private boolean reSize;
 
@@ -43,7 +44,8 @@ public class Main extends PApplet {
 
 	@Override
 	public void settings() {
-		size(750, 660); // El tama�o en este caso no importa pues en cada caso se va a cambiar el tama�o
+		size(750, 660); // El tama�o en este caso no importa pues en cada caso se va a cambiar el
+						// tama�o
 						// de la ventana segun se requiera
 	}
 
@@ -60,23 +62,32 @@ public class Main extends PApplet {
 
 		// Inicializacion de las clases/requerimientos
 		histograma = new CanalHistograma(this, canales);
+
 		alineacion = new Alineacion(this, canales);
-		contraste = new Contraste(this, canales);
-		tiffBonus = new TIFF(this, canales);
+		ncc = new AlineacionNCC(this, canales);
+
+		alineada = alineacion.getImage();
+		contraste = new Contraste(this, alineada);
+
+		alineada = contraste.getImage();
+		whitePatch = new WhitePatch(this, alineada);
+
 		bordesBonus = new RecortarBordes(this, canales);
-		whitePatch = new WhitePatch(this, canales);
-		nnc = new AlineacionNNC(this, canales);
+		tiffBonus = new TIFF(this, canales);
+		
+		reSize = true;
 	}
 
 	@Override
 	public void draw() {
 		background(0);
 		switch (caso) {
+		
 		case 0: // Separacion correcta canales de color imagen con sus respectivos
 				// historgramas.
 			histograma.display();
 
-			if(reSize) {
+			if (reSize) {
 				reSize = false;
 				histograma.reSize();
 			}
@@ -85,44 +96,45 @@ public class Main extends PApplet {
 		case 1: // Alineacion de los 3 canales de color de la imagen usando SSD.
 			alineacion.display();
 
-			if(reSize) {
+			if (reSize) {
 				reSize = false;
 				alineacion.reSize();
 			}
 			break;
 
 		case 2: // Alineacion de los 3 canales de color de la imagen usando NNC.
-			nnc.display();
+			ncc.display();
 
-			if(reSize){
+			if (reSize) {
 				reSize = false;
-				nnc.reSize();
+				ncc.reSize();
 			}
 			break;
 
 		case 3: // TODO Mejorar contraste de la imagen - Histogram equialization u otra tecnica.
 			contraste.display();
 
-			if(reSize) {
+			if (reSize) {
 				reSize = false;
 				contraste.reSize();
 			}
 			break;
 
 		case 4: // TODO whitepatch a la imagen a color ya alineada
-		whitePatch.display();
+			whitePatch.display();
 
-		if(reSize){
-			reSize = false;
-			whitePatch.reSize();
-		}
+			if (reSize) {
+				reSize = false;
+				whitePatch.reSize();
+			}
+			break;
 
 		// BONUS
 
 		case 5: // TODO usar imagenes TIFf de alta resolucion.
 			tiffBonus.display();
 
-			if(reSize) {
+			if (reSize) {
 				reSize = false;
 				tiffBonus.reSize();
 			}
@@ -131,7 +143,7 @@ public class Main extends PApplet {
 		case 6: // TODO Recortar bordes de la imagen.
 			bordesBonus.display();
 
-			if(reSize) {
+			if (reSize) {
 				reSize = false;
 				bordesBonus.reSize();
 			}

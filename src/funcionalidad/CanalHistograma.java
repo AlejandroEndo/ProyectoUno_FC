@@ -23,8 +23,6 @@ public class CanalHistograma {
 		this.app = app;
 		this.canales = canales;
 
-		// 247 * 640
-
 		w = canales[0].width;
 		h = canales[0].height;
 		offset = 10;
